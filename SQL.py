@@ -201,3 +201,25 @@ pd.set_option('display.width', 1000)
 # print(query_result("Select * from people where country != 'USA';"))
 # print(query_result("Select * from people where country != 'USA';"))
 # print(query_result("Select * from people where country in ('USA', 'Sweden');"))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Using WHERE. Using Operator: like
+# # Country finishes with letter 'a'.
+# print(query_result("Select * from people where country like '%a';"))
+# 
+# # income finishes with numbers '.31'.
+# print(query_result("Select * from people where income like '%.31';"))
+# 
+# # position starts with 1 and the whole string has 6 characters. 100 th - 199 th positions
+# print(query_result("Select * from people where position like '1_____';"))
+# 
+# # position starts with 1 and the whole string has 5 characters. 10 th - 19 th positions
+# print(query_result("Select * from people where position like '1____';"))
+# 
+# # position starts with 1 and the whole string has 4 characters. 1 th - 9 th positions
+# print(query_result("Select * from people where position like '____';"))
+
+

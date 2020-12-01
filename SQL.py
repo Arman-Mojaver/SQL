@@ -223,3 +223,17 @@ pd.set_option('display.width', 1000)
 # print(query_result("Select * from people where position like '____';"))
 
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Order by.
+# print(query_result("Select * from people ORDER BY income DESC;"))
+# print(query_result("Select * from people ORDER BY income ASC;"))
+#
+# print(query_result("Select * from people ORDER BY country, time;"))
+# print(query_result("Select * from people ORDER BY country ASC, time DESC;"))
+#
+# print(query_result("Select * from people ORDER BY kids DESC, weight ASC, income DESC;"))
+
+
+

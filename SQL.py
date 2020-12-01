@@ -158,4 +158,48 @@ def delete_table(table_name):
 
 def delete_all_records_from_table(table_name):
     execute_command('DELETE FROM ' + table_name + ';')
+
     
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# Numpy and Pandas printing settings.
+pd.set_option('display.max_columns', 50)
+pd.set_option('display.max_rows', 4000)
+pd.set_option('display.width', 1000)
+
+
+# ---------------------------------------------- SQL string generation -------------------------------------------------
+
+
+# df2 = create_db(100)
+# print(df2)
+
+# keys = ['id', 'age', 'weight', 'gender', 'smokes', 'income', 'country', 'time', 'position', 'coffee_size', 'kids']
+# types = ['int', 'int', 'int', 'char(255)', 'char(255)', 'double', 'char(255)', 'double', 'char(255)', 'char (255)', 'int']
+# create_table('people', keys, types)
+# create_table('people2', keys, types)
+
+# delete_table('people')
+# delete_all_records_from_table('people2')
+# add_rows_to_table('people2', df2)
+
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Using WHERE. Using Operators: and, or, between, !=, in
+# print(query_result("Select * from people WHERE age > 40;"))
+# print(query_result("Select * from people WHERE age between 40 and 50;"))
+# print(query_result("Select * from people WHERE weight > 80;"))
+# print(query_result("Select * from people WHERE gender = 'Female';"))
+# print(query_result("Select * from people WHERE coffee_size = 'Large' and gender = 'Female';"))
+# print(query_result("Select * from people WHERE coffee_size = 'small' or gender = 'Male';"))
+# print(query_result("Select * from people WHERE time < 10 or income > 70000;"))
+# print(query_result("Select age, gender, coffee_size from people WHERE coffee_size = 'Large' and gender = 'Female';"))
+# print(query_result("SELECT DISTINCT gender from people;"))
+# print(query_result("Select * from people where country != 'USA';"))
+# print(query_result("Select * from people where country != 'USA';"))
+# print(query_result("Select * from people where country in ('USA', 'Sweden');"))

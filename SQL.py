@@ -183,8 +183,6 @@ pd.set_option('display.width', 1000)
 # add_rows_to_table('people2', df2)
 
 
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -236,4 +234,168 @@ pd.set_option('display.width', 1000)
 # print(query_result("Select * from people ORDER BY kids DESC, weight ASC, income DESC;"))
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 
+
+# # Using Null.
+# print(query_result("Select * from people WHERE weight IS NULL"))
+# print(query_result("Select * from people WHERE country IS NULL"))
+# print(query_result("Select * from people WHERE country IS NULL or weight IS NULL"))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Using Update
+# execute_command("UPDATE people SET smokes = 'Nop' WHERE smokes = 'No';")
+# execute_command("UPDATE people SET smokes = 'No' WHERE smokes = 'Nop';")
+# execute_command("UPDATE people SET weight = 50 WHERE weight is NULL;")
+# execute_command("UPDATE people SET country = 'Mexico' WHERE country is NULL;")
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Using Delete
+# execute_command("DELETE FROM people WHERE country = 'Mexico';")
+# execute_command("DELETE FROM people WHERE country = 'USA' and position = '3rd';")
+# execute_command("DELETE FROM people2 WHERE id > 99;")
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Select a limited amount of data
+# print(query_result("Select * from people LIMIT 20;"))
+# print(query_result("Select * from people where smokes = 'YES' LIMIT 20;"))
+# print(query_result("SELECT * FROM people WHERE country = 'USA' LIMIT 3;"))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Min-Max
+# print(query_result("Select * from people ORDER BY kids DESC, income ASC;"))
+# print(query_result("SELECT MIN(income) AS lowest_income_4_kids FROM people WHERE kids = 4;"))
+# print(query_result("SELECT MAX(income) AS highest_income_2_kids FROM people WHERE kids = 2;"))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# print(query_result("SELECT * FROM people WHERE weight > 94;"))
+# print(query_result("SELECT COUNT(id) FROM people WHERE weight > 94;"))
+# print(query_result("SELECT AVG(kids) FROM people WHERE weight > 94;"))
+# print(query_result("SELECT SUM(kids) FROM people WHERE weight > 94;"))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # In Operator. people2 table only has the first 4 countries. It has 100 rows.
+# print(query_result(("SELECT DISTINCT Country FROM people2")))
+# print(query_result(("SELECT * FROM people WHERE Country IN (SELECT DISTINCT Country FROM people2);")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Between
+# print(query_result(("SELECT * FROM people WHERE income between 40000 and 60000 order by income desc;")))
+# print(query_result(("SELECT * FROM people WHERE income not between 40000 and 60000 order by income desc;")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Aliases
+# print(query_result(("SELECT id as Number_ID, kids as Number_of_Children FROM people;")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Joins
+# print(query_result(("SELECT people.id, people.age, people.income, people2.id, people2.age, people2.income FROM " +
+#                     "people inner join people2 on people.id=people2.id;")))
+# print(query_result(("SELECT people.id, people.age, people.income, people2.id, people2.age, people2.income FROM " +
+#                     "people left outer join people2 on people.id=people2.id;")))
+# print(query_result(("SELECT people.id, people.age, people.income, people2.id, people2.age, people2.income FROM " +
+#                     "people right outer join people2 on people.id=people2.id;")))
+
+# # MySQL does not have a full outer join, you have to do a union of left outer join and right outer join.
+# print(query_result(("SELECT people.id, people.age, people.income, people2.id, people2.age, people2.income FROM " +
+#                     "people right outer join people2 on people.id=people2.id" + " UNION " +
+#                     "SELECT people.id, people.age, people.income,people2.id, people2.age, people2.income FROM " +
+#                     "people left outer join people2 on people.id=people2.id;")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Self Joins
+# print(query_result(("SELECT A.id as ID_A, B.id as ID_B, A.kids, A.country, A.coffee_size, B.kids, "
+#                     "B.country, B.coffee_size FROM people A, "
+#                     "people B WHERE A.kids = B.kids and A.country = B.country and A.coffee_size = B.coffee_"
+#                     "size ORDER BY A.id;")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Union. The UNION operator selects only distinct values by default. To allow duplicate values, use UNION ALL.
+# print(query_result(("SELECT * FROM people UNION ALL SELECT * FROM people2;")))
+# print(query_result(("SELECT * FROM people UNION SELECT * FROM people2;")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Group by.
+# print(query_result(("SELECT COUNT(id), Country from people group by country ORDER BY COUNT(id) DESC;")))
+# print(query_result(("SELECT COUNT(id), kids from people group by kids ORDER BY COUNT(id) DESC;")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Having. Used with aggregate functions.
+# print(query_result(("SELECT COUNT(id), Country from people group by country "
+#                     "having count(id) > 21 ORDER BY COUNT(id) DESC;")))
+# print(query_result(("SELECT COUNT(id), kids from people group by kids "
+#                     "having count(id) > 37 ORDER BY COUNT(id) DESC;")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Exists
+# print(query_result(("SELECT * FROM people WHERE id = 200;")))  # returns 1 row
+# print(query_result(("SELECT * FROM people WHERE id = 200 and kids = 0;")))  # returns 0 rows
+#
+# # Since the condition in the exist clause is true
+# # (because at least one record is returned), everything before 'EXISTS' is queried.
+# print(query_result(("SELECT people.id, people.age FROM people WHERE EXISTS (SELECT * FROM people WHERE id = 200);")))
+#
+# # Since the condition in the exist clause is false
+# # (because at least one record is returned), everything nothing is queried.
+# print(query_result(("SELECT people.id, people.age FROM people "
+#                     "WHERE EXISTS (SELECT * FROM people WHERE id = 200 and kids = 0);")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# # Any
+# print(query_result(("SELECT id FROM people2 WHERE income > 89000;")))
+# print(query_result(("SELECT * from people2 where id = ANY(SELECT id FROM people2 WHERE income > 89000);")))
+#
+# print(query_result(("SELECT id FROM people2 WHERE income > 89000;")))
+# print(query_result(("SELECT * from people where id = ANY(SELECT id FROM people2 WHERE income > 89000);")))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+# print(load_table('people'))
+# print(load_table('people2'))

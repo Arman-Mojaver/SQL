@@ -53,8 +53,8 @@ class Person:
 
 class Purchase:
     def __init__(self, _max_id):
-        self.customer_id = randint(1, _max_id)
         self.purchase_id = None
+        self.customer_id = randint(1, _max_id)
         self.product_id = randint(1, 20)
         self.date_ts = self.get_random_date()
         self.location = self.get_location()
@@ -106,7 +106,7 @@ def create_db(size, cls, _max_id=None):
 
     elif cls == Purchase:
         assert _max_id is not None, 'A max_id value must be specified.'
-        units_ol = [cls(max_id) for _ in range(size)]
+        units_ol = [cls(_max_id) for _ in range(size)]
         for index, unit in enumerate(units_ol):
             unit.purchase_id = index + 1
     else:
@@ -213,23 +213,24 @@ pd.set_option('display.width', 1000)
 # ---------------------------------------------- SQL string generation -------------------------------------------------
 
 
-max_id = query_result("SELECT MAX(id) FROM people;").values[0][0]
-
-df2 = create_db(250, Purchase, max_id)
-# print(fix_ts(df2))
+# max_id = query_result("SELECT MAX(id) FROM people;").values[0][0]
+#
+# df2 = create_db(250, Purchase, max_id)
+# print(fix_ts(df2.copy()))
 
 # keys = ['id', 'age', 'weight', 'gender', 'smokes', 'income', 'country', 'time', 'position', 'coffee_size', 'kids']
 # types = ['int', 'int', 'int', 'char(255)', 'char(255)', 'double', 'char(255)', 'double', 'char(255)', 'char (255)', 'int']
 # create_table('people', keys, types)
 # create_table('people2', keys, types)
 
-# delete_table('purchases')
 # delete_all_records_from_table('people2')
 # add_rows_to_table('people2', df2)
 
-# keys = ['customer_id', 'purchase_id', 'product_id', 'date_ts', 'location', 'quantity', 'unit_price', 'total']
+# keys = ['purchase_id', 'customer_id', 'product_id', 'date_ts', 'location', 'quantity', 'unit_price', 'total']
 # types = ['int', 'int', 'int', 'double', 'char(255)', 'int', 'double', 'double']
 # create_table('purchases', keys, types)
+
+# delete_table('purchases')
 
 # add_rows_to_table('purchases', df2)
 # delete_all_records_from_table('purchases')
@@ -448,6 +449,16 @@ df2 = create_db(250, Purchase, max_id)
 # print(query_result(("SELECT id FROM people2 WHERE income > 89000;")))
 # print(query_result(("SELECT * from people where id = ANY(SELECT id FROM people2 WHERE income > 89000);")))
 
+# print(query_result(("SELECT * FROM purchases WHERE total > 3000 order by customer_id;")))
+# print(query_result(("SELECT * from people where id = ANY(SELECT customer_id FROM purchases WHERE total > 3000);")))
+
+# print(query_result(("SELECT * FROM purchases WHERE total > 3000 order by customer_id;")))
+# print(query_result(("SELECT * from people where id = ALL(SELECT customer_id FROM purchases WHERE total > 3000);")))
+
+
+# print(query_result(("SELECT * FROM purchases WHERE quantity > 38;")))
+# print(query_result(("SELECT * from people where age < ALL(SELECT quantity FROM purchases WHERE quantity > 38);")))
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -455,6 +466,15 @@ df2 = create_db(250, Purchase, max_id)
 # print(load_table('people'))
 # print(load_table('people2'))
 
+print(fix_ts(load_table('purchases')))
+
+
 
 # execute_command("INSERT INTO tabla(id, age, weight, gender, smokes, income, country, time, position, coffee_size, kids) VALUES (202, 60, 80, null, 'No', 48358.12, 'Finland', null, '3rd', 'small', 2);")
+
+
+
+
+
+
 

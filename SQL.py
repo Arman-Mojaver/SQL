@@ -3,6 +3,8 @@ from sshtunnel import SSHTunnelForwarder
 import MySQLdb as mdb
 import pandas as pd
 import os
+from datetime import datetime, timedelta
+import pytz
 
 
 _ = '-----------------------------------------------------------------------------------'
@@ -49,6 +51,31 @@ class Person:
                                                            self.position, self.coffee_size)
 
 
+class Purchase:
+    def __init__(self, _max_id):
+        self.customer_id = randint(1, _max_id)
+        self.purchase_id = None
+        self.product_id = randint(1, 20)
+        self.date_ts = self.get_random_date()
+        self.location = self.get_location()
+        self.quantity = randint(1, 40)
+        self.unit_price = round(uniform(1, 100), 2)
+        self.total = self.quantity * self.unit_price
+
+    @staticmethod
+    def get_location():
+        list_of_locations = ['Madrid', 'Paris', 'Berlin', 'Oslo', 'Rome', 'London', 'Dublin', 'Vienna']
+        return choice(list_of_locations)
+
+    @staticmethod
+    def get_random_date():
+        today = datetime.now(tz=pytz.UTC)
+        time_delta = timedelta(days=randint(0, 364), hours=randint(0, 23),
+                               minutes=randint(0, 59), seconds=randint(0, 59), microseconds=today.microsecond)
+        random_dt = today - time_delta
+        return datetime.timestamp(random_dt)
+
+
 def cardinal(number):
     last_digit = str(number)[-1]
 
@@ -67,13 +94,23 @@ def cardinal(number):
         return str(number) + ' th'
 
 
-def create_db(size):
-    units_ol = [Person() for _ in range(size)]
-    numbers_list = list(range(1, size + 1))
-    shuffle(numbers_list)
-    for index, (unit, number) in enumerate(zip(units_ol, numbers_list)):
-        unit.position = cardinal(number)
-        unit.id = index + 1
+def create_db(size, cls, _max_id=None):
+    units_ol = []
+    if cls == Person:
+        units_ol = [cls() for _ in range(size)]
+        numbers_list = list(range(1, size + 1))
+        shuffle(numbers_list)
+        for index, (unit, number) in enumerate(zip(units_ol, numbers_list)):
+            unit.position = cardinal(number)
+            unit.id = index + 1
+
+    elif cls == Purchase:
+        assert _max_id is not None, 'A max_id value must be specified.'
+        units_ol = [cls(max_id) for _ in range(size)]
+        for index, unit in enumerate(units_ol):
+            unit.purchase_id = index + 1
+    else:
+        assert cls != Person or cls != Purchase, 'choose a correct class: Person or Purchase.'
     return pd.DataFrame([vars(o) for o in units_ol])
 
 
@@ -157,7 +194,13 @@ def delete_table(table_name):
 def delete_all_records_from_table(table_name):
     execute_command('DELETE FROM ' + table_name + ';')
 
-    
+
+def fix_ts(df):
+    df['date_ts'] = df['date_ts'].apply(datetime.fromtimestamp)
+    return df
+
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 
@@ -170,18 +213,29 @@ pd.set_option('display.width', 1000)
 # ---------------------------------------------- SQL string generation -------------------------------------------------
 
 
-# df2 = create_db(100)
-# print(df2)
+max_id = query_result("SELECT MAX(id) FROM people;").values[0][0]
+
+df2 = create_db(250, Purchase, max_id)
+# print(fix_ts(df2))
 
 # keys = ['id', 'age', 'weight', 'gender', 'smokes', 'income', 'country', 'time', 'position', 'coffee_size', 'kids']
 # types = ['int', 'int', 'int', 'char(255)', 'char(255)', 'double', 'char(255)', 'double', 'char(255)', 'char (255)', 'int']
 # create_table('people', keys, types)
 # create_table('people2', keys, types)
 
-# delete_table('people')
+# delete_table('purchases')
 # delete_all_records_from_table('people2')
 # add_rows_to_table('people2', df2)
 
+# keys = ['customer_id', 'purchase_id', 'product_id', 'date_ts', 'location', 'quantity', 'unit_price', 'total']
+# types = ['int', 'int', 'int', 'double', 'char(255)', 'int', 'double', 'double']
+# create_table('purchases', keys, types)
+
+# add_rows_to_table('purchases', df2)
+# delete_all_records_from_table('purchases')
+
+# print(query_result("Select * from purchases;"))
+# print(fix_ts(query_result("Select * from purchases;")))
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -207,16 +261,16 @@ pd.set_option('display.width', 1000)
 # # Using WHERE. Using Operator: like
 # # Country finishes with letter 'a'.
 # print(query_result("Select * from people where country like '%a';"))
-# 
+#
 # # income finishes with numbers '.31'.
 # print(query_result("Select * from people where income like '%.31';"))
-# 
+#
 # # position starts with 1 and the whole string has 6 characters. 100 th - 199 th positions
 # print(query_result("Select * from people where position like '1_____';"))
-# 
+#
 # # position starts with 1 and the whole string has 5 characters. 10 th - 19 th positions
 # print(query_result("Select * from people where position like '1____';"))
-# 
+#
 # # position starts with 1 and the whole string has 4 characters. 1 th - 9 th positions
 # print(query_result("Select * from people where position like '____';"))
 
@@ -232,6 +286,7 @@ pd.set_option('display.width', 1000)
 # print(query_result("Select * from people ORDER BY country ASC, time DESC;"))
 #
 # print(query_result("Select * from people ORDER BY kids DESC, weight ASC, income DESC;"))
+
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -276,7 +331,7 @@ pd.set_option('display.width', 1000)
 
 # # Min-Max
 # print(query_result("Select * from people ORDER BY kids DESC, income ASC;"))
-# print(query_result("SELECT MIN(income) AS lowest_income_4_kids FROM people WHERE kids = 4;"))
+# print(query_result("SELECT MAX(id) FROM people;"))
 # print(query_result("SELECT MAX(income) AS highest_income_2_kids FROM people WHERE kids = 2;"))
 
 
@@ -399,3 +454,7 @@ pd.set_option('display.width', 1000)
 
 # print(load_table('people'))
 # print(load_table('people2'))
+
+
+# execute_command("INSERT INTO tabla(id, age, weight, gender, smokes, income, country, time, position, coffee_size, kids) VALUES (202, 60, 80, null, 'No', 48358.12, 'Finland', null, '3rd', 'small', 2);")
+
